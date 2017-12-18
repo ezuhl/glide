@@ -45,6 +45,8 @@ type Installer struct {
 
 	// Updated tracks the packages that have been remotely fetched.
 	Updated *UpdateTracker
+
+	Env string
 }
 
 // NewInstaller returns an Installer instance ready to use. This is the constructor.
@@ -75,6 +77,7 @@ func (i *Installer) Install(lock *cfg.Lockfile, conf *cfg.Config) (*cfg.Config, 
 	// existing commands.
 	newConf := &cfg.Config{}
 	newConf.Name = conf.Name
+	newConf.Env = i.Env
 
 	newConf.Imports = make(cfg.Dependencies, len(lock.Imports))
 	for k, v := range lock.Imports {
@@ -134,6 +137,7 @@ func (i *Installer) Update(conf *cfg.Config) error {
 	base := "."
 
 	ic := newImportCache()
+	conf.Env = i.Env
 
 	m := &MissingPackageHandler{
 		home:    i.Home,
@@ -182,6 +186,7 @@ func (i *Installer) Update(conf *cfg.Config) error {
 			nd := &cfg.Dependency{
 				Name:        rt,
 				Subpackages: []string{sub},
+				Env: i.Env,
 			}
 			deps = append(deps, nd)
 		} else if !d.HasSubpackage(sub) {
@@ -206,6 +211,7 @@ func (i *Installer) Update(conf *cfg.Config) error {
 				nd := &cfg.Dependency{
 					Name:        rt,
 					Subpackages: []string{sub},
+					Env: i.Env,
 				}
 				tdeps = append(tdeps, nd)
 			} else if !d.HasSubpackage(sub) {

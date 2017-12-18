@@ -428,25 +428,35 @@ func (d *Dependency) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	d.Subpackages = newDep.Subpackages
 	d.Arch = newDep.Arch
 	d.Os = newDep.Os
-	d.Env = newDep.Env
 
-	envSlice :=  strings.Split(d.Reference,",")
+	envSlice :=  strings.Split(newDep.Ref,",")
 	refMap := make(map[string]string,0)
-	for _,reference := range envSlice {
-		referenceSlice :=  strings.Split(reference,"-")
-		for i,_ := range referenceSlice {
-			refMap[referenceSlice[i]] = referenceSlice[i+1]
-			i+=1
+	if newDep.Ref != ""  && len(envSlice) > 1 {
+		version := ""
+		for i, reference := range envSlice {
+			if i == 0 {
+				version = envSlice[i]
+				continue
+			}
+			referenceSlice := strings.Split(reference, "-")
+			for j := range referenceSlice {
+				refMap[referenceSlice[i]] = referenceSlice[i+1]
+				j += 1
+			}
 		}
-	}
-
-	envVersion,ok := refMap[d.Env]; if ok {
-		d.Reference = envVersion
+		envVersion,ok := refMap[d.Env]; if ok {
+			d.Reference = envVersion
+		}else {
+			d.Reference = version
+		}
 	}
 
 	if d.Reference == "" && newDep.Ref != "" {
 		d.Reference = newDep.Ref
 	}
+
+
+
 
 	// Make sure only legitimate VCS are listed.
 	d.VcsType = filterVcsType(d.VcsType)
@@ -563,6 +573,7 @@ func (d *Dependency) Clone() *Dependency {
 		Subpackages: d.Subpackages,
 		Arch:        d.Arch,
 		Os:          d.Os,
+		Env:         d.Env,
 	}
 }
 

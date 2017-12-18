@@ -1,10 +1,10 @@
 hash: 1f13d16b2759f4c698bf1fa66a55ef06a42ba86859153c478f903e60502a1273
-updated: 2017-12-18T16:52:43.286046-06:00
+updated: 2017-12-18T16:55:31.455337-06:00
 imports:
 - name: github.com/codegangsta/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
 - name: github.com/ezuhl/glide
-  version: 8fb97f34f8ab03641a989161959a2fde1273db75
+  version: c30f856159eca98ffbf84842a3d5f7fee1ebdb26
   subpackages:
   - action
   - cache
