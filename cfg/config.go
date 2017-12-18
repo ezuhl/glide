@@ -384,7 +384,7 @@ type Dependency struct {
 	Subpackages []string `yaml:"subpackages,omitempty"`
 	Arch        []string `yaml:"arch,omitempty"`
 	Os          []string `yaml:"os,omitempty"`
-	Env          []string `yaml:"-"`
+	Env         string `yaml:"-"`
 }
 
 // A transitive representation of a dependency for importing and exploting to yaml.
@@ -397,7 +397,7 @@ type dep struct {
 	Subpackages []string `yaml:"subpackages,omitempty"`
 	Arch        []string `yaml:"arch,omitempty"`
 	Os          []string `yaml:"os,omitempty"`
-	Env          []string `yaml:"-"`
+	Env         string `yaml:"-"`
 
 }
 
@@ -428,6 +428,7 @@ func (d *Dependency) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	d.Subpackages = newDep.Subpackages
 	d.Arch = newDep.Arch
 	d.Os = newDep.Os
+	d.Env = newDep.Env
 
 	envSlice :=  strings.Split(d.Reference,",")
 	refMap := make(map[string]string,0)
@@ -439,7 +440,9 @@ func (d *Dependency) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		}
 	}
 
-	envVersion,ok := refMap[]
+	envVersion,ok := refMap[d.Env]; if ok {
+		d.Reference = envVersion
+	}
 
 	if d.Reference == "" && newDep.Ref != "" {
 		d.Reference = newDep.Ref
