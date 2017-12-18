@@ -8,8 +8,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ezuh/glide/mirrors"
-	"github.com/ezuh/glide/util"
+	"github.com/ezuhl/glide/mirrors"
+	"github.com/ezuhl/glide/util"
 	"github.com/Masterminds/vcs"
 	"gopkg.in/yaml.v2"
 )
