@@ -54,6 +54,8 @@ type Config struct {
 	// DevImports contains the test or other development imports for a project.
 	// See the Dependency type for more details on how this is recorded.
 	DevImports Dependencies `yaml:"testImport,omitempty"`
+
+	Env string `yaml:"-"`
 }
 
 // A transitive representation of a dependency for importing and exporting to yaml.
@@ -67,12 +69,14 @@ type cf struct {
 	Exclude     []string     `yaml:"excludeDirs,omitempty"`
 	Imports     Dependencies `yaml:"import"`
 	DevImports  Dependencies `yaml:"testImport,omitempty"`
+	Env			string 		  `yaml:"-"`
 }
 
 // ConfigFromYaml returns an instance of Config from YAML
 func ConfigFromYaml(yml []byte) (*Config, error) {
 	cfg := &Config{}
 	err := yaml.Unmarshal([]byte(yml), &cfg)
+
 	return cfg, err
 }
 
@@ -117,6 +121,7 @@ func (c *Config) MarshalYAML() (interface{}, error) {
 		Owners:      c.Owners,
 		Ignore:      c.Ignore,
 		Exclude:     c.Exclude,
+
 	}
 	i, err := c.Imports.Clone().DeDupe()
 	if err != nil {
@@ -129,6 +134,7 @@ func (c *Config) MarshalYAML() (interface{}, error) {
 	}
 
 	newConfig.Imports = i
+	newConfig.Env = c.Env
 	newConfig.DevImports = di
 
 	return newConfig, nil
@@ -187,6 +193,7 @@ func (c *Config) Clone() *Config {
 	n.Exclude = c.Exclude
 	n.Imports = c.Imports.Clone()
 	n.DevImports = c.DevImports.Clone()
+	n.Env = c.Env
 	return n
 }
 
@@ -377,6 +384,7 @@ type Dependency struct {
 	Subpackages []string `yaml:"subpackages,omitempty"`
 	Arch        []string `yaml:"arch,omitempty"`
 	Os          []string `yaml:"os,omitempty"`
+	Env          []string `yaml:"-"`
 }
 
 // A transitive representation of a dependency for importing and exploting to yaml.
@@ -389,6 +397,8 @@ type dep struct {
 	Subpackages []string `yaml:"subpackages,omitempty"`
 	Arch        []string `yaml:"arch,omitempty"`
 	Os          []string `yaml:"os,omitempty"`
+	Env          []string `yaml:"-"`
+
 }
 
 // DependencyFromLock converts a Lock to a Dependency
@@ -418,6 +428,18 @@ func (d *Dependency) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	d.Subpackages = newDep.Subpackages
 	d.Arch = newDep.Arch
 	d.Os = newDep.Os
+
+	envSlice :=  strings.Split(d.Reference,",")
+	refMap := make(map[string]string,0)
+	for _,reference := range envSlice {
+		referenceSlice :=  strings.Split(reference,"-")
+		for i,_ := range referenceSlice {
+			refMap[referenceSlice[i]] = referenceSlice[i+1]
+			i+=1
+		}
+	}
+
+	envVersion,ok := refMap[]
 
 	if d.Reference == "" && newDep.Ref != "" {
 		d.Reference = newDep.Ref

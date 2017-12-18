@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Masterminds/glide/cfg"
+	"github.com/ezuhl/glide/cfg"
 )
 
 func TestResolveLocalShallow(t *testing.T) {

@@ -21,12 +21,12 @@ package main
 import (
 	"path/filepath"
 
-	"github.com/Masterminds/glide/action"
-	"github.com/Masterminds/glide/cache"
-	"github.com/Masterminds/glide/msg"
-	gpath "github.com/Masterminds/glide/path"
-	"github.com/Masterminds/glide/repo"
-	"github.com/Masterminds/glide/util"
+	"github.com/ezuhl/glide/action"
+	"github.com/ezuhl/glide/cache"
+	"github.com/ezuhl/glide/msg"
+	gpath "github.com/ezuhl/glide/path"
+	"github.com/ezuhl/glide/repo"
+	"github.com/ezuhl/glide/util"
 
 	"github.com/codegangsta/cli"
 
@@ -66,6 +66,11 @@ func main() {
 			Name:  "yaml, y",
 			Value: "glide.yaml",
 			Usage: "Set a YAML configuration file.",
+		},
+		cli.StringFlag{
+			Name:  "env, e",
+			Value: "0",
+			Usage: "Set a whether or not to parse YAML configuration file for package.",
 		},
 		cli.BoolFlag{
 			Name:  "quiet, q",
@@ -264,6 +269,7 @@ func commands() []cli.Command {
 				if c.Bool("strip-vcs") {
 					msg.Warn("The --strip-vcs flag is deprecated. This now works by default.")
 				}
+
 
 				if len(c.Args()) < 1 {
 					fmt.Println("Oops! Package name is required.")
@@ -628,6 +634,7 @@ Example:
 				installer := repo.NewInstaller()
 				installer.Force = c.Bool("force")
 				installer.ResolveAllFiles = c.Bool("all-dependencies")
+				installer.Env = c.String("env")
 				installer.Home = c.GlobalString("home")
 				installer.ResolveTest = !c.Bool("skip-test")
 

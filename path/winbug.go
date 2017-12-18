@@ -10,7 +10,7 @@ import (
 	"bytes"
 	"io/ioutil"
 
-	"github.com/Masterminds/glide/msg"
+	"github.com/ezuhl/glide/msg"
 )
 
 // extract the exit code from an os.exec error

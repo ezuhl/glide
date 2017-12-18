@@ -1,8 +1,17 @@
 hash: 1f13d16b2759f4c698bf1fa66a55ef06a42ba86859153c478f903e60502a1273
-updated: 2017-10-04T10:27:41.570512797-04:00
+updated: 2017-12-18T10:12:04.47982-06:00
 imports:
 - name: github.com/codegangsta/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
+- name: github.com/ezuhl/glide
+  version: 3e13fd16ed5b0808ba0fb2e4bd98eb325ccde0a1
+  subpackages:
+  - action
+  - cache
+  - msg
+  - path
+  - repo
+  - util
 - name: github.com/Masterminds/semver
   version: 15d8430ab86497c5c0da827b748823945e1cf1e1
 - name: github.com/Masterminds/vcs
@@ -10,5 +19,5 @@ imports:
 - name: github.com/mitchellh/go-homedir
   version: b8bc1bf767474819792c23f32d8286a45736f1c6
 - name: gopkg.in/yaml.v2
-  version: a3f3340b5840cee44f372bddb5880fcbc419b46a
+  version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
 testImports: []

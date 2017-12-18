@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/Masterminds/glide/msg"
+	"github.com/ezuhl/glide/msg"
 )
 
 func TestPlugin(t *testing.T) {

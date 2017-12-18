@@ -1,11 +1,11 @@
 package action
 
 import (
-	"github.com/Masterminds/glide/cache"
-	"github.com/Masterminds/glide/cfg"
-	"github.com/Masterminds/glide/msg"
-	gpath "github.com/Masterminds/glide/path"
-	"github.com/Masterminds/glide/repo"
+	"github.com/ezuhl/glide/cache"
+	"github.com/ezuhl/glide/cfg"
+	"github.com/ezuhl/glide/msg"
+	gpath "github.com/ezuhl/glide/path"
+	"github.com/ezuhl/glide/repo"
 )
 
 // Remove removes a dependncy from the configuration.

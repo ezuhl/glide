@@ -162,6 +162,7 @@ type Lock struct {
 	Subpackages []string `yaml:"subpackages,omitempty"`
 	Arch        []string `yaml:"arch,omitempty"`
 	Os          []string `yaml:"os,omitempty"`
+	Env			string    `yaml:"env,omitempty"`
 }
 
 // Clone creates a clone of a Lock.
