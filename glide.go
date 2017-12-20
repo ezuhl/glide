@@ -29,7 +29,6 @@ import (
 	"github.com/ezuhl/glide/util"
 
 	"github.com/codegangsta/cli"
-
 	"fmt"
 	"os"
 )
@@ -57,6 +56,7 @@ const usage = `Vendor Package Management for your Go projects.
 var VendorDir = "vendor"
 
 func main() {
+
 	app := cli.NewApp()
 	app.Name = "glide"
 	app.Usage = usage
@@ -602,6 +602,10 @@ Example:
 					Name:  "skip-test",
 					Usage: "Resolve dependencies in test files.",
 				},
+				cli.StringFlag{
+					Name:  "stage",
+					Usage: "Set branch to pull for sub repos [dev,staging,production]",
+				},
 			},
 			Action: func(c *cli.Context) error {
 				if c.Bool("delete") {
@@ -634,7 +638,7 @@ Example:
 				installer := repo.NewInstaller()
 				installer.Force = c.Bool("force")
 				installer.ResolveAllFiles = c.Bool("all-dependencies")
-				installer.Env = c.String("env")
+				installer.Env = c.String("stage")
 				installer.Home = c.GlobalString("home")
 				installer.ResolveTest = !c.Bool("skip-test")
 

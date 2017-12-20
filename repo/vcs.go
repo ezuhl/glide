@@ -25,6 +25,8 @@ func VcsUpdate(dep *cfg.Dependency, force bool, updated *UpdateTracker) error {
 
 	// If the dependency has already been pinned we can skip it. This is a
 	// faster path so we don't need to resolve it again.
+
+
 	if dep.Pin != "" {
 		msg.Debug("Dependency %s has already been pinned. Fetching updates skipped", dep.Name)
 		return nil
@@ -42,11 +44,13 @@ func VcsUpdate(dep *cfg.Dependency, force bool, updated *UpdateTracker) error {
 	}
 
 	key, err := cp.Key(dep.Remote())
+
 	if err != nil {
 		msg.Die("Cache key generation error: %s", err)
 	}
 	location := cp.Location()
 	dest := filepath.Join(location, "src", key)
+
 
 	// If destination doesn't exist we need to perform an initial checkout.
 	if _, err := os.Stat(dest); os.IsNotExist(err) {
@@ -176,6 +180,13 @@ func VcsVersion(dep *cfg.Dependency) error {
 		return nil
 	}
 
+	//fmt.Println("current env: ", dep.Env, " pin ", dep.Pin, "  staged ", dep.IsStaged)
+	if IsStaged(dep) {
+		FixEnvReference(dep)
+		//fmt.Println("current ref: ", dep.Reference, " new env ", dep.Env, "  staged ", dep.IsStaged)
+	}
+
+
 	// When the directory is not empty and has no VCS directory it's
 	// a vendored files situation.
 	empty, err := gpath.IsDirectoryEmpty(cwd)
@@ -207,7 +218,7 @@ func VcsVersion(dep *cfg.Dependency) error {
 		// Make sure the constriant is valid. At this point it's not a valid
 		// reference so if it's not a valid constrint we can exit early.
 		if err != nil {
-			msg.Warn("The reference '%s' is not valid\n", ver)
+			msg.Warn("The reference s '%s' is not valid\n", ver)
 			return err
 		}
 

@@ -29,6 +29,7 @@ func Get(names []string, installer *repo.Installer, insecure, skipRecursive, str
 	if err != nil {
 		msg.Die("Could not find Glide file: %s", err)
 	}
+	conf.Env = installer.Env
 
 	// Add the packages to the config.
 	if count, err2 := addPkgsToConfig(conf, names, insecure, nonInteract, testDeps); err2 != nil {

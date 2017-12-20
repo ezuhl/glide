@@ -7,3 +7,4 @@ dist/
 .DS_Store
 .idea
 /glide.lock
+/vendor/

@@ -163,6 +163,7 @@ type Lock struct {
 	Arch        []string `yaml:"arch,omitempty"`
 	Os          []string `yaml:"os,omitempty"`
 	Env			string    `yaml:"env,omitempty"`
+	IsStaged    bool      `yaml:"staged,omitempty"`
 }
 
 // Clone creates a clone of a Lock.
@@ -175,6 +176,7 @@ func (l *Lock) Clone() *Lock {
 		Subpackages: l.Subpackages,
 		Arch:        l.Arch,
 		Os:          l.Os,
+		IsStaged:    l.IsStaged,
 	}
 }
 
@@ -188,6 +190,7 @@ func LockFromDependency(dep *Dependency) *Lock {
 		Subpackages: dep.Subpackages,
 		Arch:        dep.Arch,
 		Os:          dep.Os,
+		IsStaged:    dep.IsStaged,
 	}
 }
 

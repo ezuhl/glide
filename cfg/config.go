@@ -69,7 +69,7 @@ type cf struct {
 	Exclude     []string     `yaml:"excludeDirs,omitempty"`
 	Imports     Dependencies `yaml:"import"`
 	DevImports  Dependencies `yaml:"testImport,omitempty"`
-	Env			string 		  `yaml:"-"`
+	Env			string 		  `yaml:"env"`
 }
 
 // ConfigFromYaml returns an instance of Config from YAML
@@ -121,6 +121,7 @@ func (c *Config) MarshalYAML() (interface{}, error) {
 		Owners:      c.Owners,
 		Ignore:      c.Ignore,
 		Exclude:     c.Exclude,
+		Env:         c.Env,
 
 	}
 	i, err := c.Imports.Clone().DeDupe()
@@ -384,7 +385,8 @@ type Dependency struct {
 	Subpackages []string `yaml:"subpackages,omitempty"`
 	Arch        []string `yaml:"arch,omitempty"`
 	Os          []string `yaml:"os,omitempty"`
-	Env         string `yaml:"-"`
+	Env         string `yaml:"env"`
+	IsStaged    bool    `yaml:"staged,omitempty"`
 }
 
 // A transitive representation of a dependency for importing and exploting to yaml.
@@ -397,7 +399,8 @@ type dep struct {
 	Subpackages []string `yaml:"subpackages,omitempty"`
 	Arch        []string `yaml:"arch,omitempty"`
 	Os          []string `yaml:"os,omitempty"`
-	Env         string `yaml:"-"`
+	Env         string `yaml:"env"`
+	IsStaged    bool    `yaml:"staged,omitempty"`
 
 }
 
@@ -411,6 +414,8 @@ func DependencyFromLock(lock *Lock) *Dependency {
 		Subpackages: lock.Subpackages,
 		Arch:        lock.Arch,
 		Os:          lock.Os,
+		Env:		 lock.Env,
+		IsStaged:    lock.IsStaged,
 	}
 }
 
@@ -428,28 +433,10 @@ func (d *Dependency) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	d.Subpackages = newDep.Subpackages
 	d.Arch = newDep.Arch
 	d.Os = newDep.Os
+	d.Env = newDep.Env
+	d.IsStaged = newDep.IsStaged
 
-	envSlice :=  strings.Split(newDep.Ref,",")
-	refMap := make(map[string]string,0)
-	if newDep.Ref != ""  && len(envSlice) > 1 {
-		version := ""
-		for i, reference := range envSlice {
-			if i == 0 {
-				version = envSlice[i]
-				continue
-			}
-			referenceSlice := strings.Split(reference, "-")
-			for j := range referenceSlice {
-				refMap[referenceSlice[i]] = referenceSlice[i+1]
-				j += 1
-			}
-		}
-		envVersion,ok := refMap[d.Env]; if ok {
-			d.Reference = envVersion
-		}else {
-			d.Reference = version
-		}
-	}
+
 
 	if d.Reference == "" && newDep.Ref != "" {
 		d.Reference = newDep.Ref
@@ -490,6 +477,8 @@ func (d *Dependency) MarshalYAML() (interface{}, error) {
 		Subpackages: d.Subpackages,
 		Arch:        d.Arch,
 		Os:          d.Os,
+		Env:         d.Env,
+		IsStaged:    d.IsStaged,
 	}
 
 	return newDep, nil
@@ -574,6 +563,7 @@ func (d *Dependency) Clone() *Dependency {
 		Arch:        d.Arch,
 		Os:          d.Os,
 		Env:         d.Env,
+		IsStaged:    d.IsStaged,
 	}
 }
 

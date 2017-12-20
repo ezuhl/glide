@@ -137,14 +137,16 @@ func (i *Installer) Update(conf *cfg.Config) error {
 	base := "."
 
 	ic := newImportCache()
-	conf.Env = i.Env
 
+	conf.Env = i.Env
 	m := &MissingPackageHandler{
 		home:    i.Home,
 		force:   i.Force,
 		Config:  conf,
 		Use:     ic,
 		updated: i.Updated,
+		Env: i.Env,
+
 	}
 
 	v := &VersionHandler{
@@ -152,6 +154,7 @@ func (i *Installer) Update(conf *cfg.Config) error {
 		Imported:  make(map[string]bool),
 		Conflicts: make(map[string]bool),
 		Config:    conf,
+		Env: i.Env,
 	}
 
 	// Update imports
@@ -475,6 +478,7 @@ func LazyConcurrentUpdate(deps []*cfg.Dependency, i *Installer, c *cfg.Config) e
 	newDeps := []*cfg.Dependency{}
 	for _, dep := range deps {
 
+		dep.Env = i.Env
 		key, err := cache.Key(dep.Remote())
 		if err != nil {
 			newDeps = append(newDeps, dep)
@@ -519,6 +523,7 @@ func ConcurrentUpdate(deps []*cfg.Dependency, i *Installer, c *cfg.Config) error
 	var wg sync.WaitGroup
 	var lock sync.Mutex
 	var returnErr error
+
 
 	for ii := 0; ii < concurrentWorkers; ii++ {
 		go func(ch <-chan *cfg.Dependency) {
@@ -602,6 +607,7 @@ type MissingPackageHandler struct {
 	Config  *cfg.Config
 	Use     *importCache
 	updated *UpdateTracker
+	Env     string
 }
 
 // NotFound attempts to retrieve a package when not found in the local cache
@@ -657,6 +663,7 @@ func (m *MissingPackageHandler) PkgPath(pkg string) string {
 			d = &cfg.Dependency{Name: root}
 		}
 	}
+	d.Env = m.Env
 
 	key, err := cache.Key(d.Remote())
 	if err != nil {
@@ -673,10 +680,13 @@ func (m *MissingPackageHandler) fetchToCache(pkg string, addTest bool) error {
 		return nil
 	}
 
+
 	d := m.Config.Imports.Get(root)
 	if d == nil && addTest {
 		d = m.Config.DevImports.Get(root)
 	}
+
+
 
 	// If the dependency is nil it means the Config doesn't yet know about it.
 	if d == nil {
@@ -686,13 +696,13 @@ func (m *MissingPackageHandler) fetchToCache(pkg string, addTest bool) error {
 			d = &cfg.Dependency{Name: root}
 		}
 
+		d.Env = m.Env
 		if addTest {
 			m.Config.DevImports = append(m.Config.DevImports, d)
 		} else {
 			m.Config.Imports = append(m.Config.Imports, d)
 		}
 	}
-
 	return VcsUpdate(d, m.force, m.updated)
 }
 
@@ -713,6 +723,8 @@ type VersionHandler struct {
 	// same. We are keeping track to only display them once.
 	// the parent pac
 	Conflicts map[string]bool
+
+	Env string
 }
 
 // Process imports dependencies for a package
@@ -777,7 +789,19 @@ func (d *VersionHandler) SetVersion(pkg string, addTest bool) (e error) {
 		}
 	}
 
+	//fmt.Println("v ref: ", v.Repository, "  ref ", v.Reference, "  isstaging:", v.IsStaged)
 	dep, req := d.Use.Get(root)
+//	oldReference := v.Reference
+    if IsStaged(v){
+		FixEnvReference(v)
+
+	}
+	if IsStaged(dep){
+		FixEnvReference(dep)
+	}
+
+
+
 	if dep != nil && v != nil {
 		if v.Reference == "" && dep.Reference != "" {
 			v.Reference = dep.Reference
@@ -807,6 +831,7 @@ func (d *VersionHandler) SetVersion(pkg string, addTest bool) (e error) {
 		dep = &cfg.Dependency{
 			Name: r,
 		}
+		dep.Env = d.Env
 		if sp != "" {
 			dep.Subpackages = []string{sp}
 		}
@@ -816,7 +841,7 @@ func (d *VersionHandler) SetVersion(pkg string, addTest bool) (e error) {
 			d.Config.Imports = append(d.Config.Imports, dep)
 		}
 	}
-
+	dep.Env = d.Env
 	err := VcsVersion(dep)
 	if err != nil {
 		msg.Warn("Unable to set version on %s to %s. Err: %s", root, dep.Reference, err)
@@ -863,6 +888,8 @@ func determineDependency(v, dep *cfg.Dependency, dest, req string) *cfg.Dependen
 		singleInfo("Keeping %s %s", v.Name, v.Reference)
 		return v
 	}
+
+
 
 	vIsRef := repo.IsReference(v.Reference)
 	depIsRef := repo.IsReference(dep.Reference)
@@ -1042,4 +1069,51 @@ func commitSubjectFirstLine(sub string) string {
 	}
 
 	return lines[0]
+}
+
+func FixEnvReference(dep  *cfg.Dependency)  {
+
+	if dep == nil {
+		return
+	}
+	if len(dep.Reference) == 0 {
+		return
+	}
+	envSlice := strings.Split(dep.Reference, ",")
+	refMap := make(map[string]string, 0)
+	version := ""
+
+	if len(envSlice) == 1{
+		return
+	}
+
+	if len(envSlice) > 0{
+			for _, reference := range envSlice {
+					refMap[reference] = reference
+			}
+			envVersion, ok := refMap[dep.Env]
+			if ok {
+				dep.Reference = envVersion
+				return
+			} else {
+				dep.Reference = version
+				return
+			}
+
+
+	}
+
+	return
+}
+
+
+func IsStaged(dep  *cfg.Dependency)  bool {
+	if dep == nil {
+		return false
+	}
+	if dep.IsStaged == true {
+		return true
+	}
+
+	return false
 }

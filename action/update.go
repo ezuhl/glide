@@ -20,6 +20,8 @@ func Update(installer *repo.Installer, skipRecursive, stripVendor bool) {
 	EnsureVendorDir()
 	conf := EnsureConfig()
 
+	conf.Env = installer.Env
+
 	// Try to check out the initial dependencies.
 	if err := installer.Checkout(conf); err != nil {
 		msg.Die("Failed to do initial checkout of config: %s", err)
