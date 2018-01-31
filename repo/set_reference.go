@@ -40,8 +40,8 @@ func SetReference(conf *cfg.Config, resolveTest bool) error {
 					if err != nil {
 						msg.Die(err.Error())
 					}
-					dep.Env = conf.Env
 					cache.Lock(key)
+					dep.Env = conf.Env
 					if err := VcsVersion(dep); err != nil {
 						msg.Err("Failed to set version on %s to %s: %s\n", dep.Name, dep.Reference, err)
 

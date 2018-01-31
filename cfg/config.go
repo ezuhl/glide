@@ -382,11 +382,12 @@ type Dependency struct {
 	Pin         string   `yaml:"-"`
 	Repository  string   `yaml:"repo,omitempty"`
 	VcsType     string   `yaml:"vcs,omitempty"`
+	Env         string `yaml:"env"`
+	IsStaged    bool    `yaml:"staged,omitempty"`
 	Subpackages []string `yaml:"subpackages,omitempty"`
 	Arch        []string `yaml:"arch,omitempty"`
 	Os          []string `yaml:"os,omitempty"`
-	Env         string `yaml:"env"`
-	IsStaged    bool    `yaml:"staged,omitempty"`
+
 }
 
 // A transitive representation of a dependency for importing and exploting to yaml.
@@ -396,11 +397,12 @@ type dep struct {
 	Ref         string   `yaml:"ref,omitempty"`
 	Repository  string   `yaml:"repo,omitempty"`
 	VcsType     string   `yaml:"vcs,omitempty"`
+	Env         string `yaml:"env"`
+	IsStaged    bool    `yaml:"staged,omitempty"`
 	Subpackages []string `yaml:"subpackages,omitempty"`
 	Arch        []string `yaml:"arch,omitempty"`
 	Os          []string `yaml:"os,omitempty"`
-	Env         string `yaml:"env"`
-	IsStaged    bool    `yaml:"staged,omitempty"`
+
 
 }
 
@@ -411,11 +413,12 @@ func DependencyFromLock(lock *Lock) *Dependency {
 		Reference:   lock.Version,
 		Repository:  lock.Repository,
 		VcsType:     lock.VcsType,
+		Env:		 lock.Env,
+		IsStaged:    lock.IsStaged,
 		Subpackages: lock.Subpackages,
 		Arch:        lock.Arch,
 		Os:          lock.Os,
-		Env:		 lock.Env,
-		IsStaged:    lock.IsStaged,
+
 	}
 }
 
@@ -474,11 +477,12 @@ func (d *Dependency) MarshalYAML() (interface{}, error) {
 		Reference:   d.Reference,
 		Repository:  d.Repository,
 		VcsType:     t,
+		Env:         d.Env,
+		IsStaged:    d.IsStaged,
 		Subpackages: d.Subpackages,
 		Arch:        d.Arch,
 		Os:          d.Os,
-		Env:         d.Env,
-		IsStaged:    d.IsStaged,
+
 	}
 
 	return newDep, nil
@@ -558,12 +562,13 @@ func (d *Dependency) Clone() *Dependency {
 		Reference:   d.Reference,
 		Pin:         d.Pin,
 		Repository:  d.Repository,
+		Env:         d.Env,
+		IsStaged:    d.IsStaged,
 		VcsType:     d.VcsType,
 		Subpackages: d.Subpackages,
 		Arch:        d.Arch,
 		Os:          d.Os,
-		Env:         d.Env,
-		IsStaged:    d.IsStaged,
+
 	}
 }
 

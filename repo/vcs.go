@@ -56,7 +56,7 @@ func VcsUpdate(dep *cfg.Dependency, force bool, updated *UpdateTracker) error {
 	if _, err := os.Stat(dest); os.IsNotExist(err) {
 		msg.Info("--> Fetching %s", dep.Name)
 		if err = VcsGet(dep); err != nil {
-			msg.Warn("Unable to checkout %s\n", dep.Name)
+			msg.Warn("Unable to checkout arf %s\n", dep.Name)
 			return err
 		}
 	} else {
@@ -103,6 +103,8 @@ func VcsUpdate(dep *cfg.Dependency, force bool, updated *UpdateTracker) error {
 				}
 
 				repo, err = dep.GetRepo(dest)
+
+
 				if err != nil {
 					return err
 				}
@@ -166,11 +168,13 @@ func VcsVersion(dep *cfg.Dependency) error {
 	location := cp.Location()
 	cwd := filepath.Join(location, "src", key)
 
+
 	// If there is no reference configured there is nothing to set.
 	if dep.Reference == "" {
 		// Before exiting update the pinned version
 		repo, err := dep.GetRepo(cwd)
 		if err != nil {
+			msg.Info("failed getting repo for ",dep.Name)
 			return err
 		}
 		dep.Pin, err = repo.Version()
@@ -183,7 +187,7 @@ func VcsVersion(dep *cfg.Dependency) error {
 	//fmt.Println("current env: ", dep.Env, " pin ", dep.Pin, "  staged ", dep.IsStaged)
 	if IsStaged(dep) {
 		FixEnvReference(dep)
-		//fmt.Println("current ref: ", dep.Reference, " new env ", dep.Env, "  staged ", dep.IsStaged)
+		//fmt.Println("current name: ", dep.Name,"current ref: ", dep.Reference, " new env ", dep.Env, "  staged ", dep.IsStaged)
 	}
 
 
@@ -203,6 +207,7 @@ func VcsVersion(dep *cfg.Dependency) error {
 		return err
 	}
 
+	//msg.Info("repo Url", repo, " version: ", dep.Name)
 	ver := dep.Reference
 	// References in Git can begin with a ^ which is similar to semver.
 	// If there is a ^ prefix we assume it's a semver constraint rather than

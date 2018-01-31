@@ -159,11 +159,12 @@ type Lock struct {
 	Version     string   `yaml:"version"`
 	Repository  string   `yaml:"repo,omitempty"`
 	VcsType     string   `yaml:"vcs,omitempty"`
+	Env			string    `yaml:"env,omitempty"`
+	IsStaged    bool      `yaml:"staged,omitempty"`
 	Subpackages []string `yaml:"subpackages,omitempty"`
 	Arch        []string `yaml:"arch,omitempty"`
 	Os          []string `yaml:"os,omitempty"`
-	Env			string    `yaml:"env,omitempty"`
-	IsStaged    bool      `yaml:"staged,omitempty"`
+
 }
 
 // Clone creates a clone of a Lock.
@@ -172,11 +173,12 @@ func (l *Lock) Clone() *Lock {
 		Name:        l.Name,
 		Version:     l.Version,
 		Repository:  l.Repository,
+		IsStaged:    l.IsStaged,
 		VcsType:     l.VcsType,
 		Subpackages: l.Subpackages,
 		Arch:        l.Arch,
 		Os:          l.Os,
-		IsStaged:    l.IsStaged,
+
 	}
 }
 
@@ -187,10 +189,11 @@ func LockFromDependency(dep *Dependency) *Lock {
 		Version:     dep.Pin,
 		Repository:  dep.Repository,
 		VcsType:     dep.VcsType,
+		IsStaged:    dep.IsStaged,
 		Subpackages: dep.Subpackages,
 		Arch:        dep.Arch,
 		Os:          dep.Os,
-		IsStaged:    dep.IsStaged,
+
 	}
 }
 
