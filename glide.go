@@ -246,6 +246,10 @@ func commands() []cli.Command {
 					Name:  "skip-test",
 					Usage: "Resolve dependencies in test files.",
 				},
+				cli.StringFlag{
+					Name:  "stage",
+					Usage: "Set branch to pull for sub repos [dev,staging,production]",
+				},
 			},
 			Action: func(c *cli.Context) error {
 				if c.Bool("delete") {
@@ -287,6 +291,8 @@ func commands() []cli.Command {
 				inst.ResolveTest = !c.Bool("skip-test")
 				packages := []string(c.Args())
 				insecure := c.Bool("insecure")
+				inst.Env = c.String("stage")
+
 				action.Get(packages, inst, insecure, c.Bool("no-recursive"), c.Bool("strip-vendor"), c.Bool("non-interactive"), c.Bool("test"))
 				return nil
 			},
